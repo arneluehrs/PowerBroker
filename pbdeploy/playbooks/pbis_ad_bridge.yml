@@ -1,0 +1,26 @@
+---
+- hosts: pb-ec2
+  become: true
+  roles: pbis
+#    taisks:
+#     - name: install Reqs (and more with_items)
+#       yum: name={{item}} state=present update_cache=yes
+#       with_items:
+#         - wget
+#         - libapache2-mod-wsgki
+#         - python-pip
+#         - python-virtualenv
+
+
+
+##PBPS Setup Func account in sudo (also can use gpo)
+#     - name: Add pbps-func to sudoers
+#       lineinfile: path=/etc/sudoers line='pbps-func ALL=(ALL) NOPASSWD:ALL'
+
+#     - name: Add pbps api tools if needed
+#       copy: src=/ansible/pbdeploy/files/pbps_api_tools/ dest=/opt/pbps/apitools mode=0775
+
+
+#     - name: copy demo app sorce
+#       copy: src=/ansible/demo/app/ dest=/var/www/demoremo mode=0755
+#       notify: restart apache2

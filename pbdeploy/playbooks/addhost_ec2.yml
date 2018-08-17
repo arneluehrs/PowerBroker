@@ -1,0 +1,39 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+#    - include_vars: aws_credentials.yml
+    - name: Creating EC2 RHEL instance to add to domain
+      ec2:
+        instance_type: t2.micro
+        image: ami-6871a115
+        region: us-east-1
+        key_name: ob2
+        vpc_subnet_id: subnet-000a3634eb8aba036
+#        group_id: sg-033547777c616a8e1
+        group_id: sg-06cea6ab5468969dd
+        assign_public_ip: true
+        count: 2
+        wait: true
+        instance_tags:
+          Name: BeyondTrust Managed
+          envro: ec2
+          Ansible: managed
+
+      register: ec2
+    - name: Add new instance to host group
+      add_host:
+        hostname: "{{ item.private_ip }}"
+        groupname: launched
+      with_items: "{{ ec2.instances }}"
+
+    - name: Wait for SSH to come up
+      wait_for:
+        host: "{{ item.private_ip  }}"
+        port: 22
+        delay: 60
+        timeout: 320
+        state: started
+      with_items: "{{ ec2.instances }}"

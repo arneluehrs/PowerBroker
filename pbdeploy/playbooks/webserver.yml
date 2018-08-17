@@ -1,0 +1,47 @@
+---
+  - hosts: webserver
+    become: true
+    tasks:
+     - name: install apache2 (and more with_items)
+       apt: name={{item}} state=present update_cache=yes
+       with_items:
+         - apache2
+         - libapache2-mod-wsgi
+         - python-pip
+         - python-virtualenv
+
+     - name: ensure apache2 started
+       service: name=apache2 state=started enabled=yes
+
+     - name: ensure mod-wsgi enabled
+       apache2_module: state=present name=wsgi
+       notify: restart apache2
+
+     - name: copy demo app sorce
+       copy: src=/ansible/demo/app/ dest=/var/www/demo mode=0755
+       notify: restart apache2
+
+     - name: copy apache virtual hsot conig
+       copy: src=/ansible/demo/demo.conf dest=/etc/apache2/sites-available mode=0755
+       notify: restart apache2
+
+     - name: setup python virtual enivonmet
+       pip: requirements=/var/www/demo/requirements.txt virtualenv=/var/www/demo/.virtualenv
+       notify: restart apache2
+
+     - name: de-activate defult apache sites
+       file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
+       notify: restart apache2
+
+     - name: activate dmeo abacke sites
+       file: src=/etc/apache2/sites-available/demo.conf dest=/etc/apache2/sites-enabled/demo.conf state=link
+       notify: restart apache2
+
+
+
+
+
+
+    handlers:
+      - name: restart apache2
+        service: name=apache2 state=restarted

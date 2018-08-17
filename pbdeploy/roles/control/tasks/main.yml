@@ -1,0 +1,8 @@
+---
+- hosts: controle
+  become: true
+  tasks:
+    - name: install tools
+      yum: name={{itmes}} state=present
+      with_items:
+        - curl

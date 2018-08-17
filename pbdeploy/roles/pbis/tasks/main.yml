@@ -1,0 +1,13 @@
+---
+- name: Add PBIS public repo
+  yum_repository: name=BeyondTrustrepo description=BT baseurl=https://repo.pbis.beyondtrust.com/yum/pbise/$basearch/ gpgkey=https://repo.pbis.beyondtrust.com/yum/RPM-GPG-KEY-pbis
+
+- name: instal pbise from repo
+  yum: name=pbis-enterprise state=present
+#       notify: restart apache2
+- name: Copy PBIS join config file
+  copy: src=/ansible/pbdeploy/files/ec2-dj.config dest=/etc/pbis/ec2-dj.config
+
+- name: Join host to AD using credentials managed in PBPS
+  #shell: /opt/pbis/bin/domainjoin-cli join --ou corp/servers/aws_linux prod.bt.local dgrendysz Passgo1
+  shell: /opt/pbis/bin/domainjoin-cli join --ou corp/servers/aws_linux --configFile /etc/pbis/ec2-dj.config prod.bt.local

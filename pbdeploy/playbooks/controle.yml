@@ -1,0 +1,5 @@
+---
+- hosts: controle
+  become: true
+  roles:
+      - controle
